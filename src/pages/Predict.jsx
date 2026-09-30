@@ -1,7 +1,39 @@
 import { useState } from 'react'
 
+const API_URL = 'https://protein-ss-backend.onrender.com'
+
+const colorMap = { H: 'bg-error', E: 'bg-tertiary-container', C: 'bg-surface-bright' }
+
 export default function Predict() {
   const [sequence, setSequence] = useState('')
+  const [result, setResult] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  const handlePredict = async () => {
+    if (!sequence.trim()) return
+    setLoading(true)
+    setError(null)
+    setResult(null)
+
+    try {
+      const res = await fetch(`${API_URL}/predict/baseline`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sequence: sequence.trim() }),
+      })
+      if (!res.ok) {
+        const errData = await res.json()
+        throw new Error(errData.detail || 'Prediction failed')
+      }
+      const data = await res.json()
+      setResult(data)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="flex-1 p-gutter md:p-container-padding flex flex-col gap-6">
@@ -28,55 +60,65 @@ export default function Predict() {
             onChange={(e) => setSequence(e.target.value)}
           ></textarea>
         </div>
+        {error && (
+          <div className="z-10 bg-error/10 border border-error/30 text-error px-4 py-2 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
         <div className="flex justify-between items-center z-10">
-          <button className="text-on-surface-variant text-[10px] font-bold uppercase flex items-center gap-2 hover:text-white transition-colors">
-            <span className="material-symbols-outlined text-sm">swap_horiz</span> Switch to Best Model
-          </button>
-          <button className="bg-primary-container text-on-primary-container text-[10px] font-bold uppercase px-8 py-3 rounded-lg shadow-[0_0_15px_rgba(0,219,233,0.4)] flex items-center gap-2 hover:brightness-110">
-            <span className="material-symbols-outlined text-sm">play_arrow</span> Predict
+          <span className="text-on-surface-variant text-[10px] font-bold uppercase">
+            Works on any sequence — evolutionary profile not required
+          </span>
+          <button
+            onClick={handlePredict}
+            disabled={loading}
+            className="bg-primary-container text-on-primary-container text-[10px] font-bold uppercase px-8 py-3 rounded-lg shadow-[0_0_15px_rgba(0,219,233,0.4)] flex items-center gap-2 hover:brightness-110 disabled:opacity-50"
+          >
+            <span className="material-symbols-outlined text-sm">play_arrow</span>
+            {loading ? 'Predicting...' : 'Predict'}
           </button>
         </div>
       </section>
 
-      <section className="glass-panel-real-border p-6 flex flex-col gap-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-headline-md text-primary">Prediction Results</h2>
-          <div className="flex gap-4">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-on-surface-variant">
-              <div className="w-2 h-2 rounded-full bg-error"></div> Helix
+      {result && (
+        <section className="glass-panel-real-border p-6 flex flex-col gap-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-headline-md text-primary">Prediction Results</h2>
+            <div className="flex gap-4">
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-on-surface-variant">
+                <div className="w-2 h-2 rounded-full bg-error"></div> Helix
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-on-surface-variant">
+                <div className="w-2 h-2 rounded-full bg-tertiary-container"></div> Strand
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-on-surface-variant">
+                <div className="w-2 h-2 rounded-full bg-surface-bright"></div> Coil
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-on-surface-variant">
-              <div className="w-2 h-2 rounded-full bg-tertiary-container"></div> Strand
+          </div>
+
+          <div className="w-full h-8 flex rounded-full overflow-hidden border border-white/10 bg-surface-container-lowest">
+            {result.predicted_structure.split('').map((c, i) => (
+              <div key={i} className={`h-full ${colorMap[c]}`} style={{ width: `${100 / result.predicted_structure.length}%` }}></div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div className="glass-panel px-4 py-3 rounded-lg text-center flex flex-col gap-1">
+              <span className="text-2xl font-bold text-white">{result.percentages.H}%</span>
+              <span className="text-[10px] uppercase font-bold text-on-surface-variant">Helix</span>
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-on-surface-variant">
-              <div className="w-2 h-2 rounded-full bg-surface-bright"></div> Coil
+            <div className="glass-panel px-4 py-3 rounded-lg text-center flex flex-col gap-1">
+              <span className="text-2xl font-bold text-white">{result.percentages.E}%</span>
+              <span className="text-[10px] uppercase font-bold text-on-surface-variant">Strand</span>
+            </div>
+            <div className="glass-panel px-4 py-3 rounded-lg text-center flex flex-col gap-1">
+              <span className="text-2xl font-bold text-white">{result.percentages.C}%</span>
+              <span className="text-[10px] uppercase font-bold text-on-surface-variant">Coil</span>
             </div>
           </div>
-        </div>
-        <div className="w-full h-8 flex rounded-full overflow-hidden border border-white/10 bg-surface-container-lowest">
-          <div className="h-full bg-surface-bright" style={{ width: '15%' }}></div>
-          <div className="h-full bg-error" style={{ width: '25%' }}></div>
-          <div className="h-full bg-surface-bright" style={{ width: '10%' }}></div>
-          <div className="h-full bg-tertiary-container" style={{ width: '20%' }}></div>
-          <div className="h-full bg-surface-bright" style={{ width: '5%' }}></div>
-          <div className="h-full bg-error" style={{ width: '15%' }}></div>
-          <div className="h-full bg-surface-bright" style={{ width: '10%' }}></div>
-        </div>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="glass-panel px-4 py-3 rounded-lg text-center flex flex-col gap-1">
-            <span className="text-2xl font-bold text-white">42%</span>
-            <span className="text-[10px] uppercase font-bold text-on-surface-variant">Helix</span>
-          </div>
-          <div className="glass-panel px-4 py-3 rounded-lg text-center flex flex-col gap-1">
-            <span className="text-2xl font-bold text-white">24%</span>
-            <span className="text-[10px] uppercase font-bold text-on-surface-variant">Strand</span>
-          </div>
-          <div className="glass-panel px-4 py-3 rounded-lg text-center flex flex-col gap-1">
-            <span className="text-2xl font-bold text-white">34%</span>
-            <span className="text-[10px] uppercase font-bold text-on-surface-variant">Coil</span>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   )
 }
