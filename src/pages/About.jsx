@@ -1,3 +1,5 @@
+import React from 'react'
+
 export default function About() {
   const stages = [
     { icon: 'database', title: 'Dataset', desc: 'CullPDB / CB513' },
@@ -26,15 +28,20 @@ export default function About() {
           <span className="material-symbols-outlined text-primary-fixed-dim">account_tree</span>
           <h2 className="text-2xl font-bold">Architecture Pipeline</h2>
         </div>
-        <div className="flex flex-col md:flex-row justify-between items-start gap-8">
+        <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 md:gap-0">
           {stages.map((stage, idx) => (
-            <div key={idx} className="flex-1 timeline-connector flex flex-col items-center text-center px-4 relative">
-              <div className="w-12 h-12 rounded-full bg-surface-container-highest border border-primary-fixed-dim/30 flex items-center justify-center mb-4 z-10">
-                <span className="material-symbols-outlined text-primary-fixed-dim text-xl">{stage.icon}</span>
+            <React.Fragment key={idx}>
+              <div className="flex-1 flex flex-col items-center text-center px-4 relative">
+                <div className="w-12 h-12 rounded-full bg-surface-container-highest border border-primary-fixed-dim/30 flex items-center justify-center mb-4 z-10">
+                  <span className="material-symbols-outlined text-primary-fixed-dim text-xl">{stage.icon}</span>
+                </div>
+                <h3 className="text-xs font-bold uppercase mb-1">{stage.title}</h3>
+                <p className="text-[10px] text-on-surface-variant uppercase">{stage.desc}</p>
               </div>
-              <h3 className="text-xs font-bold uppercase mb-1">{stage.title}</h3>
-              <p className="text-[10px] text-on-surface-variant uppercase">{stage.desc}</p>
-            </div>
+              {idx < stages.length - 1 && (
+                <div className="w-px h-8 md:h-px md:w-8 bg-outline-variant opacity-30 mx-auto my-2 md:my-0 shrink-0 md:-mt-8"></div>
+              )}
+            </React.Fragment>
           ))}
         </div>
       </div>

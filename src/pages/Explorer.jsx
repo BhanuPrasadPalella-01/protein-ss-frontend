@@ -2,13 +2,22 @@ import { useState, useEffect } from 'react'
 
 const API_URL = 'https://protein-ss-backend.onrender.com'
 
-const ssColor = { H: 'bg-error', E: 'bg-yellow-500', C: 'bg-slate-500' }
+// Updated to use your custom theme colors
+const ssColor = { H: 'bg-error', E: 'bg-tertiary-container', C: 'bg-surface-bright' }
 
 function StructureStrip({ structure }) {
+  // Optimization: Group identical consecutive characters to drastically reduce DOM nodes
+  const blocks = structure.match(/(.)\1*/g) || [];
+  const totalLen = structure.length;
+
   return (
-    <div className="flex flex-nowrap gap-[1px]">
-      {structure.split('').map((c, i) => (
-        <div key={i} className={`w-3 h-5 rounded-sm ${ssColor[c]}`}></div>
+    <div className="flex h-5 w-full rounded-sm overflow-hidden gap-[1px]">
+      {blocks.map((block, i) => (
+        <div
+          key={i}
+          className={ssColor[block[0]]}
+          style={{ width: `${(block.length / totalLen) * 100}%` }}
+        ></div>
       ))}
     </div>
   )
@@ -63,9 +72,8 @@ export default function Explorer() {
               <div
                 key={s.id}
                 onClick={() => setSelectedId(s.id)}
-                className={`p-3 rounded-md cursor-pointer transition-all border-l-2 ${
-                  s.id === selectedId ? 'bg-primary-container/10 border-primary-fixed-dim' : 'border-transparent hover:bg-white/5'
-                }`}
+                className={`p-3 rounded-md cursor-pointer transition-all border-l-2 ${s.id === selectedId ? 'bg-primary-container/10 border-primary-fixed-dim' : 'border-transparent hover:bg-white/5'
+                  }`}
               >
                 <div className="text-sm font-bold">{s.id}</div>
                 <div className="text-[10px] text-on-surface-variant uppercase">Length: {s.length}</div>
@@ -96,8 +104,8 @@ export default function Explorer() {
                 <h3 className="text-[10px] font-bold uppercase tracking-widest text-primary-fixed-dim">Structural Alignment</h3>
                 <div className="flex gap-4 text-[10px] font-bold uppercase">
                   <div className="flex items-center gap-2"><div className="w-2 h-2 bg-error"></div> Helix</div>
-                  <div className="flex items-center gap-2"><div className="w-2 h-2 bg-yellow-500"></div> Strand</div>
-                  <div className="flex items-center gap-2"><div className="w-2 h-2 bg-slate-500"></div> Coil</div>
+                  <div className="flex items-center gap-2"><div className="w-2 h-2 bg-tertiary-container"></div> Strand</div>
+                  <div className="flex items-center gap-2"><div className="w-2 h-2 bg-surface-bright"></div> Coil</div>
                 </div>
               </div>
 

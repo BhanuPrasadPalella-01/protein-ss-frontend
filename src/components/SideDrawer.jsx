@@ -13,26 +13,38 @@ export default function SideDrawer() {
   ]
 
   return (
-    <nav className="bg-surface/90 backdrop-blur-2xl h-screen w-72 border-r border-white/10 flex-col p-container-padding gap-base hidden md:flex sticky top-0 z-40">
-      <div className="mb-8 mt-4">
-        <span className="font-headline-md text-xl font-bold text-primary-fixed-dim block">SEQUENCER V2.1</span>
-        <span className="text-[10px] text-on-surface-variant uppercase tracking-widest">Neural Protein System</span>
+    <nav className="bg-surface/50 backdrop-blur-md h-[calc(100vh-5rem)] w-64 border-r border-white/10 flex-col p-6 gap-6 hidden md:flex sticky top-20 z-40">
+
+      <div className="mb-4">
+        <span className="font-headline-md text-lg font-bold text-on-surface block">SEQUENCER V2.1</span>
+        <span className="text-[10px] text-primary-fixed-dim uppercase tracking-widest font-bold mt-1 block">Neural Protein System</span>
       </div>
+
       <div className="flex flex-col gap-2">
-        {items.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
-              isActive(item.path)
-                ? 'bg-primary-container/20 text-primary-fixed-dim shadow-[0_0_10px_rgba(0,219,233,0.2)]'
-                : 'text-on-surface-variant hover:bg-white/5'
-            }`}
-          >
-            <span className="material-symbols-outlined">{item.icon}</span>
-            <span className="font-label-caps text-xs uppercase tracking-wider">{item.label}</span>
-          </Link>
-        ))}
+        {items.map((item) => {
+          const active = isActive(item.path);
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex items-center gap-3 p-3 rounded-lg transition-all border ${active
+                  ? 'bg-primary-container/10 border-primary-fixed-dim/30 text-primary-fixed-dim glow-border-cyan'
+                  : 'border-transparent text-on-surface-variant hover:bg-white/5 hover:text-on-surface hover:border-white/10'
+                }`}
+            >
+              <span className={`material-symbols-outlined ${active ? 'text-primary-fixed-dim' : ''}`} style={{ fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0" }}>
+                {item.icon}
+              </span>
+              <span className="font-label-caps text-xs uppercase tracking-wider font-semibold">{item.label}</span>
+            </Link>
+          )
+        })}
+      </div>
+
+      {/* Optional: Add a system status indicator at the bottom */}
+      <div className="mt-auto glass-panel p-4 rounded-xl flex items-center gap-3">
+        <div className="w-2 h-2 rounded-full bg-tertiary-container animate-pulse shadow-[0_0_8px_#2df882]"></div>
+        <div className="text-[10px] font-bold uppercase text-on-surface-variant tracking-widest">System Online</div>
       </div>
     </nav>
   )

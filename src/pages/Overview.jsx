@@ -40,18 +40,24 @@ export default function Overview() {
 
       <section className="max-w-5xl mx-auto mb-16">
         <h2 className="text-2xl font-bold text-center mb-8">Pipeline Architecture</h2>
-        <div className="relative glass-panel rounded-xl p-8 flex flex-col md:flex-row justify-between items-center gap-8 md:gap-0">
-          <div className="hidden md:block absolute top-1/2 left-[15%] right-[15%] h-[2px] bg-outline-variant -translate-y-1/2 z-0 opacity-30"></div>
+        <div className="relative glass-panel rounded-xl p-8 flex flex-col md:flex-row justify-between items-center gap-0">
+
           <div className="flex flex-col items-center text-center relative z-10 w-full md:w-1/3">
             <div className="w-16 h-16 rounded-full bg-surface-container-highest border border-outline flex items-center justify-center mb-4"><span className="material-symbols-outlined text-outline">dataset</span></div>
             <h4 className="text-[10px] font-bold uppercase mb-1">CULLPDB DATASET</h4>
             <p className="text-[10px] text-outline">Sequence Input (One-Hot)</p>
           </div>
+
+          <div className="w-px h-12 md:h-px md:w-16 bg-outline-variant opacity-30 mx-auto my-4 md:my-0 md:-mt-10 shrink-0"></div>
+
           <div className="flex flex-col items-center text-center relative z-10 w-full md:w-1/3">
             <div className="w-16 h-16 rounded-full bg-surface-container border border-primary-fixed-dim shadow-[0_0_15px_rgba(0,219,233,0.3)] flex items-center justify-center mb-4"><span className="material-symbols-outlined text-primary-fixed-dim" style={{ fontVariationSettings: "'FILL' 1" }}>schema</span></div>
             <h4 className="text-[10px] font-bold uppercase mb-1">BiLSTM NETWORK</h4>
             <p className="text-[10px] text-outline">Contextual Extraction</p>
           </div>
+
+          <div className="w-px h-12 md:h-px md:w-16 bg-outline-variant opacity-30 mx-auto my-4 md:my-0 md:-mt-10 shrink-0"></div>
+
           <div className="flex flex-col items-center text-center relative z-10 w-full md:w-1/3">
             <div className="w-16 h-16 rounded-full bg-surface-container border border-secondary shadow-[0_0_15px_rgba(228,181,255,0.3)] flex items-center justify-center mb-4"><span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>memory</span></div>
             <h4 className="text-[10px] font-bold uppercase mb-1">ATTENTION</h4>

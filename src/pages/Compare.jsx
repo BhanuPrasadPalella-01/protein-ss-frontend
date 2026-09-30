@@ -44,13 +44,14 @@ export default function Compare() {
             <div className="flex items-center gap-2"><div className="w-3 h-3 bg-secondary-fixed-dim"></div> +Attention</div>
           </div>
         </div>
-                <div className="h-[300px] flex items-stretch gap-12 pl-12 border-l border-b border-white/10 relative z-10">
+        {/* Changed items-stretch to items-end to properly anchor the bar charts */}
+        <div className="h-[300px] flex items-end gap-12 pl-12 border-l border-b border-white/10 relative z-10 pb-4">
           {chartData.map((item, idx) => (
-            <div key={idx} className="flex-1 h-full flex flex-col items-center gap-1 group">
-              <div className="flex-1 w-full flex items-end justify-center gap-1">
-                <div className="w-6 bg-surface-container-highest rounded-t" style={{ height: `${item.val[0]}%` }}></div>
-                <div className="w-6 bg-primary-fixed-dim/60 rounded-t" style={{ height: `${item.val[1]}%` }}></div>
-                <div className="w-6 bg-secondary-fixed-dim rounded-t shadow-[0_0_10px_rgba(228,181,255,0.4)]" style={{ height: `${item.val[2]}%` }}></div>
+            <div key={idx} className="flex-1 h-full flex flex-col items-center gap-1 group justify-end">
+              <div className="w-full flex items-end justify-center gap-1 h-full">
+                <div className="w-6 bg-surface-container-highest rounded-t transition-all" style={{ height: `${item.val[0]}%` }}></div>
+                <div className="w-6 bg-primary-fixed-dim/60 rounded-t transition-all" style={{ height: `${item.val[1]}%` }}></div>
+                <div className="w-6 bg-secondary-fixed-dim rounded-t shadow-[0_0_10px_rgba(228,181,255,0.4)] transition-all" style={{ height: `${item.val[2]}%` }}></div>
               </div>
               <span className="text-[10px] font-bold uppercase mt-2 text-on-surface-variant whitespace-nowrap shrink-0">{item.label}</span>
             </div>
