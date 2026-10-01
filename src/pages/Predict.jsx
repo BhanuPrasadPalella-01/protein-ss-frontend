@@ -33,13 +33,20 @@ export default function Predict() {
         body: JSON.stringify({ sequence: sequence.trim() }),
       })
       if (!res.ok) {
-        const errData = await res.json()
-        throw new Error(errData.detail || 'Prediction failed')
+        // 400s carry a human-readable validation message from the backend; show it as-is.
+        const errData = await res.json().catch(() => null)
+        if (res.status === 400 && typeof errData?.detail === 'string') {
+          throw new Error(errData.detail)
+        }
+        throw new Error(`Prediction failed (server error ${res.status}). Please try again.`)
       }
       const data = await res.json()
       setResult(data)
     } catch (err) {
-      setError(err.message)
+      // fetch itself rejects with a TypeError when the server can't be reached at all.
+      setError(err instanceof TypeError
+        ? "Couldn't reach the prediction server. Check your connection and try again."
+        : err.message)
     } finally {
       clearTimeout(slowTimer)
       setSlow(false)
