@@ -2,11 +2,32 @@ import { createContext, useContext } from 'react'
 
 // The active theme lives in React state (in App) and is mirrored to <html data-theme="...">,
 // which is what the CSS tokens in index.css key off. index.html ships data-theme="dark", so the
-// default theme is correct before React loads. Nothing here touches window or storage during
-// render, so it is safe to server-render.
+// default theme is correct before React loads. The saved choice in localStorage is only read
+// inside an effect (and by a small inline script in index.html), never during render, so this
+// is safe to server-render.
 export const ThemeContext = createContext({ theme: 'dark', toggleTheme: () => {} })
 
 export const useTheme = () => useContext(ThemeContext)
+
+const STORAGE_KEY = 'theme'
+
+// Storage can be unavailable (private windows, blocked site data), so failures fall back to the default.
+export function loadSavedTheme() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    return saved === 'light' || saved === 'dark' ? saved : null
+  } catch {
+    return null
+  }
+}
+
+export function saveTheme(theme) {
+  try {
+    localStorage.setItem(STORAGE_KEY, theme)
+  } catch {
+    // Not saved; the choice still applies for this visit.
+  }
+}
 
 export function applyTheme(theme) {
   if (typeof document === 'undefined') return
