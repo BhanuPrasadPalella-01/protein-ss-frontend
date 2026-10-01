@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const API_URL = 'https://protein-ss-backend.onrender.com'
 
@@ -67,8 +68,14 @@ export default function Predict() {
           </div>
           <div className="bg-primary-container/10 border border-primary/20 px-4 py-2 rounded-full flex items-center gap-2">
             <span className="material-symbols-outlined text-primary-fixed-dim text-sm">model_training</span>
-            <span className="text-[10px] font-bold uppercase text-primary-fixed-dim">Baseline Model</span>
+            <span className="text-[10px] font-bold uppercase text-primary-fixed-dim">Baseline Model · ~68.7% Q3</span>
           </div>
+        </div>
+        <div className="z-10 bg-surface-container/60 border border-white/10 px-4 py-3 rounded-lg text-sm text-on-surface-variant">
+          This live demo runs the <span className="text-on-surface font-semibold">sequence-only baseline</span> (~68.7% Q3 on CB513),
+          because the stronger models need an evolutionary profile (PSSM) that can't be computed for a pasted sequence.
+          To see the PSSM + attention model (~80% Q3), open the{' '}
+          <Link to="/explorer" className="text-primary-fixed-dim underline hover:brightness-110">CB513 Explorer</Link>.
         </div>
         <div className="z-10">
           <label className="text-[10px] uppercase font-bold text-on-surface-variant mb-2 block">Amino Acid Sequence</label>
@@ -91,7 +98,7 @@ export default function Predict() {
         )}
         <div className="flex justify-between items-center z-10">
           <span className="text-on-surface-variant text-[10px] font-bold uppercase">
-            Works on any sequence — evolutionary profile not required
+            Standard amino-acid letters only · max 700 residues
           </span>
           <button
             onClick={handlePredict}
