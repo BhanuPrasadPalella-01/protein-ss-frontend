@@ -4,6 +4,7 @@ import { Edges, Line, OrbitControls } from '@react-three/drei'
 import { CubicBezierCurve3, Quaternion, Vector3 } from 'three'
 import { EDGES, LAYERS, formatParams } from '../pages/architectureLayers'
 import { readColorTokens, useTheme } from '../theme'
+import usePrefersReducedMotion from '../hooks/usePrefersReducedMotion'
 
 // Three.js materials can't use CSS classes, so the scene reads its colors from the --color-arch-*
 // tokens in index.css (re-read whenever the theme changes).
@@ -39,18 +40,6 @@ function blockSize(layer) {
 const byId = Object.fromEntries(LAYERS.map((l) => [l.id, { ...l, size: blockSize(l) }]))
 const blockTop = (layer) => (layer.kind === 'op' ? OP_RADIUS : layer.size.height / 2)
 const blockBottom = (layer) => -blockTop(layer)
-
-function usePrefersReducedMotion() {
-  const query = '(prefers-reduced-motion: reduce)'
-  const [reduced, setReduced] = useState(() => window.matchMedia(query).matches)
-  useEffect(() => {
-    const mq = window.matchMedia(query)
-    const onChange = (e) => setReduced(e.matches)
-    mq.addEventListener('change', onChange)
-    return () => mq.removeEventListener('change', onChange)
-  }, [])
-  return reduced
-}
 
 // Labels are plain DOM elements in an overlay above the canvas. Each one is tied to an empty
 // 3D anchor object, and LabelProjector moves the element to the anchor's screen position every frame.
