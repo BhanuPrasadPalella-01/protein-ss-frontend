@@ -14,35 +14,35 @@ export default function SideDrawer() {
   ]
 
   return (
-    <nav className="bg-surface/50 backdrop-blur-md h-[calc(100vh-5rem)] w-64 border-r border-white/10 flex-col p-6 gap-6 hidden md:flex sticky top-20 z-40">
+    <nav className="bg-surface h-[calc(100vh-4rem)] w-60 border-r border-line flex-col px-4 py-6 gap-6 hidden md:flex sticky top-16 z-40">
 
-      <div className="mb-4">
-        <span className="font-headline-md text-lg font-bold text-on-surface block">Protein SS</span>
-        <span className="text-[10px] text-primary-fixed-dim uppercase tracking-widest font-bold mt-1 block">BiLSTM · Q3 Prediction</span>
+      <div className="px-3">
+        <span className="text-sm font-semibold text-fg block">Protein SS</span>
+        <span className="text-xs text-fg-muted mt-0.5 block">BiLSTM · Q3 prediction</span>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
         {items.map((item) => {
           const active = isActive(item.path);
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 p-3 rounded-lg transition-all border ${active
-                  ? 'bg-primary-container/10 border-primary-fixed-dim/30 text-primary-fixed-dim glow-border-cyan'
-                  : 'border-transparent text-on-surface-variant hover:bg-white/5 hover:text-on-surface hover:border-white/10'
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${active
+                  ? 'bg-raised text-fg'
+                  : 'text-fg-muted hover:bg-raised hover:text-fg'
                 }`}
             >
-              <span className={`material-symbols-outlined ${active ? 'text-primary-fixed-dim' : ''}`} style={{ fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0" }}>
+              <span className={`material-symbols-outlined text-[20px] ${active ? 'text-accent' : ''}`} style={{ fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0" }}>
                 {item.icon}
               </span>
-              <span className="font-label-caps text-xs uppercase tracking-wider font-semibold">{item.label}</span>
+              {item.label}
             </Link>
           )
         })}
       </div>
 
-      <div className="mt-auto glass-panel p-4 rounded-xl text-[10px] font-bold uppercase text-on-surface-variant tracking-widest leading-relaxed">
+      <div className="mt-auto px-3 text-xs text-fg-muted leading-relaxed">
         Trained on CullPDB · Tested on CB513
       </div>
     </nav>

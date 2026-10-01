@@ -14,10 +14,10 @@ export default function Compare() {
   }, [])
 
   if (error) {
-    return <div className="p-8 text-error">Failed to load comparison data: {error}</div>
+    return <div className="p-8 text-danger" role="alert">Failed to load comparison data: {error}</div>
   }
   if (!models) {
-    return <div className="p-8 text-on-surface-variant">Loading comparison data...</div>
+    return <div className="p-8 text-fg-muted">Loading comparison data...</div>
   }
 
   const [baseline, pssm, attention] = models
@@ -28,76 +28,68 @@ export default function Compare() {
     { label: 'Coil F1', val: [baseline.coil_f1 * 100, pssm.coil_f1 * 100, attention.coil_f1 * 100] },
   ]
 
+  // Bar fill and table text color for each model series, in [baseline, pssm, attention] order.
+  const barClass = ['bg-model-baseline', 'bg-model-pssm', 'bg-model-attention']
+  const valueClass = ['text-fg-muted', 'text-accent', 'text-accent-2 font-semibold']
+  const rows = [
+    { label: 'Overall Q3 accuracy', format: (m) => `${m.q3_accuracy}%` },
+    { label: 'Strand F1', format: (m) => `${(m.strand_f1 * 100).toFixed(2)}%` },
+    { label: 'Std dev (3 seeds)', format: (m) => `±${m.std_dev}` },
+    { label: 'Parameters', format: (m) => m.params.toLocaleString() },
+  ]
+
   return (
-    <div className="flex-1 p-container-padding lg:p-[40px] flex flex-col gap-panel-gap">
+    <div className="flex-1 p-gutter md:p-container-padding flex flex-col gap-panel-gap max-w-5xl">
       <div>
-        <h2 className="text-4xl font-headline-md text-white mb-2 font-bold">Model Comparison</h2>
-        <p className="text-on-surface-variant max-w-2xl">Evaluating structural classification accuracy across variant architectures.</p>
+        <h2 className="text-2xl font-semibold tracking-tight text-fg mb-1">Model comparison</h2>
+        <p className="text-fg-muted max-w-2xl">Structural classification accuracy across the three architectures.</p>
       </div>
 
-      <div className="bg-surface-container-low/60 backdrop-blur-xl border border-white/10 rounded-xl p-8 shadow-2xl relative overflow-hidden">
-        <div className="flex justify-between items-center mb-8 relative z-10">
-          <h3 className="text-xl font-bold">Metrics Distribution</h3>
-          <div className="flex gap-4 text-[10px] font-bold uppercase">
-            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-surface-container-highest"></div> Baseline</div>
-            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-primary-fixed-dim/60"></div> +PSSM</div>
-            <div className="flex items-center gap-2"><div className="w-3 h-3 bg-secondary-fixed-dim"></div> +Attention</div>
+      <div className="panel p-6 md:p-8">
+        <div className="flex justify-between items-center gap-4 flex-wrap mb-8">
+          <h3 className="text-lg font-semibold text-fg">Metrics distribution</h3>
+          <div className="flex gap-4 text-sm text-fg-muted">
+            {['Baseline', '+PSSM', '+Attention'].map((name, i) => (
+              <div key={name} className="flex items-center gap-2"><div className={`w-3 h-3 rounded-sm ${barClass[i]}`}></div> {name}</div>
+            ))}
           </div>
         </div>
-        {/* Changed items-stretch to items-end to properly anchor the bar charts */}
-        <div className="h-[300px] flex items-end gap-12 pl-12 border-l border-b border-white/10 relative z-10 pb-4">
+        <div className="h-[300px] flex items-end gap-6 md:gap-12 pl-4 md:pl-12 border-l border-b border-line pb-4">
           {chartData.map((item, idx) => (
-            <div key={idx} className="flex-1 h-full flex flex-col items-center gap-1 group justify-end">
+            <div key={idx} className="flex-1 h-full flex flex-col items-center gap-1 justify-end">
               <div className="w-full flex items-end justify-center gap-1 h-full">
-                <div className="w-6 bg-surface-container-highest rounded-t transition-all" style={{ height: `${item.val[0]}%` }}></div>
-                <div className="w-6 bg-primary-fixed-dim/60 rounded-t transition-all" style={{ height: `${item.val[1]}%` }}></div>
-                <div className="w-6 bg-secondary-fixed-dim rounded-t shadow-[0_0_10px_rgba(228,181,255,0.4)] transition-all" style={{ height: `${item.val[2]}%` }}></div>
+                {item.val.map((v, i) => (
+                  <div key={i} className={`w-6 rounded-t ${barClass[i]}`} style={{ height: `${v}%` }} title={`${v.toFixed(2)}%`}></div>
+                ))}
               </div>
-              <span className="text-[10px] font-bold uppercase mt-2 text-on-surface-variant whitespace-nowrap shrink-0">{item.label}</span>
+              <span className="text-xs font-medium mt-2 text-fg-muted whitespace-nowrap shrink-0">{item.label}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="glass-panel-real-border overflow-hidden">
-        <div className="grid grid-cols-4 p-4 border-b border-white/10 bg-white/5 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-          <div>Metric</div><div>Baseline</div><div>+PSSM</div><div>+Attention</div>
+      <div className="panel overflow-hidden">
+        <div className="grid grid-cols-4 px-4 py-3 border-b border-line bg-raised">
+          <div className="eyebrow">Metric</div><div className="eyebrow">Baseline</div><div className="eyebrow">+PSSM</div><div className="eyebrow">+Attention</div>
         </div>
-        <div className="flex flex-col">
-          <div className="grid grid-cols-4 p-4 border-b border-white/5 hover:bg-white/5 transition-colors">
-            <div className="font-bold text-sm">Overall Q3 Acc</div>
-            <div className="text-outline text-lg">{baseline.q3_accuracy}%</div>
-            <div className="text-primary text-lg">{pssm.q3_accuracy}%</div>
-            <div className="text-secondary text-lg font-bold flex items-center gap-1">
-              {attention.q3_accuracy}% <span className="material-symbols-outlined text-xs text-tertiary-container">verified</span>
-            </div>
+        {rows.map((row, r) => (
+          <div key={row.label} className={`grid grid-cols-4 px-4 py-3 hover:bg-raised transition-colors ${r > 0 ? 'border-t border-line' : ''}`}>
+            <div className="font-medium text-sm text-fg">{row.label}</div>
+            {models.map((m, i) => (
+              <div key={m.name} className={`text-base flex items-center gap-1 ${valueClass[i]}`}>
+                {row.format(m)}
+                {r === 0 && i === 2 && <span className="material-symbols-outlined text-[16px] text-success" aria-label="best">verified</span>}
+              </div>
+            ))}
           </div>
-          <div className="grid grid-cols-4 p-4 hover:bg-white/5 transition-colors">
-            <div className="font-bold text-sm">Strand F1</div>
-            <div className="text-outline text-lg">{(baseline.strand_f1 * 100).toFixed(2)}%</div>
-            <div className="text-primary text-lg">{(pssm.strand_f1 * 100).toFixed(2)}%</div>
-            <div className="text-secondary text-lg font-bold">{(attention.strand_f1 * 100).toFixed(2)}%</div>
-          </div>
-          <div className="grid grid-cols-4 p-4 border-t border-white/5 hover:bg-white/5 transition-colors">
-            <div className="font-bold text-sm">Std Dev (3-seed)</div>
-            <div className="text-outline text-lg">±{baseline.std_dev}</div>
-            <div className="text-primary text-lg">±{pssm.std_dev}</div>
-            <div className="text-secondary text-lg font-bold">±{attention.std_dev}</div>
-          </div>
-          <div className="grid grid-cols-4 p-4 border-t border-white/5 hover:bg-white/5 transition-colors">
-            <div className="font-bold text-sm">Parameters</div>
-            <div className="text-outline text-lg">{baseline.params.toLocaleString()}</div>
-            <div className="text-primary text-lg">{pssm.params.toLocaleString()}</div>
-            <div className="text-secondary text-lg font-bold">{attention.params.toLocaleString()}</div>
-          </div>
-        </div>
+        ))}
       </div>
 
-      <div className="bg-secondary/5 border-l-4 border-secondary p-6 rounded-r-xl flex gap-4">
-        <span className="material-symbols-outlined text-secondary text-3xl">lightbulb</span>
+      <div className="bg-accent-2/10 border border-accent-2/30 p-5 rounded-xl flex gap-4">
+        <span className="material-symbols-outlined text-accent-2 text-2xl">lightbulb</span>
         <div>
-          <h4 className="text-lg font-bold text-secondary mb-1">Key Insight</h4>
-          <p className="text-sm text-on-surface-variant">Evolutionary PSSM profiles closed most of the performance gap (+10.57 pts), with self-attention adding a further, smaller but statistically consistent improvement (+0.79 pts, validated across 3 random seeds).</p>
+          <h4 className="text-base font-semibold text-fg mb-1">Key insight</h4>
+          <p className="text-sm text-fg-muted">Evolutionary PSSM profiles closed most of the performance gap (+10.57 pts), with self-attention adding a further, smaller but statistically consistent improvement (+0.79 pts, validated across 3 random seeds).</p>
         </div>
       </div>
     </div>

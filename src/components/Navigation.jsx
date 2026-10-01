@@ -1,42 +1,38 @@
 import { Link, useLocation } from 'react-router-dom'
+import ThemeToggle from './ThemeToggle'
 
 export default function Navigation() {
   const location = useLocation()
   const isActive = (path) => location.pathname === path
 
   const linkClass = (path) =>
-    `font-label-caps text-xs tracking-widest flex items-center h-full border-b-2 transition-all px-2 ${isActive(path)
-      ? 'text-primary-fixed-dim border-primary-fixed-dim'
-      : 'text-on-surface-variant border-transparent hover:text-primary hover:border-primary/50'
+    `text-sm font-medium flex items-center h-full border-b-2 transition-colors px-1 ${isActive(path)
+      ? 'text-fg border-accent'
+      : 'text-fg-muted border-transparent hover:text-fg'
     }`
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-surface/85 backdrop-blur-xl border-b border-white/10 glow-border-cyan h-20 flex justify-between items-center px-6 lg:px-8">
+    <nav className="fixed top-0 left-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-line h-16 flex justify-between items-center px-6 lg:px-8">
 
       {/* Brand */}
-      <div className="flex items-center gap-3">
-        <span className="material-symbols-outlined text-primary-fixed-dim text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>biotech</span>
-        <span className="font-headline-md text-xl md:text-2xl font-bold tracking-tight text-primary-fixed-dim hidden sm:block">
+      <div className="flex items-center gap-2">
+        <span className="material-symbols-outlined text-accent text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>biotech</span>
+        <span className="text-base font-semibold tracking-tight text-fg hidden sm:block">
           NEURO-PROTEIN
         </span>
       </div>
 
       {/* Desktop Links */}
       <div className="hidden md:flex items-center h-full gap-6">
-        <Link className={linkClass('/')} to="/">OVERVIEW</Link>
-        <Link className={linkClass('/predict')} to="/predict">PREDICT</Link>
-        <Link className={linkClass('/compare')} to="/compare">COMPARE</Link>
-        <Link className={linkClass('/explorer')} to="/explorer">EXPLORE</Link>
-        <Link className={linkClass('/architecture')} to="/architecture">ARCHITECTURE</Link>
-        <Link className={linkClass('/about')} to="/about">ABOUT</Link>
+        <Link className={linkClass('/')} to="/">Overview</Link>
+        <Link className={linkClass('/predict')} to="/predict">Predict</Link>
+        <Link className={linkClass('/compare')} to="/compare">Compare</Link>
+        <Link className={linkClass('/explorer')} to="/explorer">Explore</Link>
+        <Link className={linkClass('/architecture')} to="/architecture">Architecture</Link>
+        <Link className={linkClass('/about')} to="/about">About</Link>
       </div>
 
-      {/* Profile/Settings */}
-      <div>
-        <button className="flex items-center justify-center w-10 h-10 rounded-full bg-surface-container-low border border-white/10 hover:border-primary/50 transition-colors">
-          <span className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors" style={{ fontVariationSettings: "'FILL' 0" }}>account_circle</span>
-        </button>
-      </div>
+      <ThemeToggle />
     </nav>
   )
 }

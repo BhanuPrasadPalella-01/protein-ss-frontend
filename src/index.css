@@ -1,123 +1,152 @@
 @import "tailwindcss";
 
-@theme {
-  --color-outline: #849495;
-  --color-outline-variant: #3b494b;
-  --color-primary-fixed-dim: #00dbe9;
-  --color-on-background: #dae2f8;
-  --color-surface-container-highest: #2c3546;
-  --color-tertiary: #daffdc;
-  --color-surface: #0a1323;
-  --color-on-surface-variant: #b9cacb;
-  --color-on-primary-container: #006970;
-  --color-inverse-surface: #dae2f8;
-  --color-error: #ffb4ab;
-  --color-on-error-container: #ffdad6;
-  --color-inverse-on-surface: #283141;
-  --color-on-primary-fixed: #002022;
-  --color-surface-tint: #00dbe9;
-  --color-tertiary-container: #2df882;
-  --color-tertiary-fixed: #63ff95;
-  --color-on-tertiary: #003918;
-  --color-background: #0a1323;
-  --color-primary-container: #00f0ff;
-  --color-surface-variant: #2c3546;
-  --color-on-secondary-container: #e6b9ff;
-  --color-surface-container-low: #131c2b;
-  --color-on-error: #690005;
-  --color-tertiary-fixed-dim: #00e473;
-  --color-secondary-fixed-dim: #e4b5ff;
-  --color-on-secondary-fixed-variant: #6f00a8;
-  --color-on-primary-fixed-variant: #004f54;
-  --color-on-surface: #dae2f8;
-  --color-on-tertiary-fixed-variant: #005225;
-  --color-surface-container-lowest: #050e1d;
-  --color-on-secondary-fixed: #2f004b;
-  --color-on-primary: #00363a;
-  --color-secondary: #e4b5ff;
-  --color-surface-container-high: #212a3a;
-  --color-secondary-container: #8404c5;
-  --color-on-tertiary-fixed: #00210b;
-  --color-primary-fixed: #7df4ff;
-  --color-primary: #dbfcff;
-  --color-on-secondary: #4e0078;
-  --color-secondary-fixed: #f4d9ff;
-  --color-error-container: #93000a;
-  --color-on-tertiary-container: #006d34;
-  --color-inverse-primary: #006970;
-  --color-surface-container: #172030;
-  --color-surface-dim: #0a1323;
-  --color-surface-bright: #30394a;
+/*
+ * Design tokens. Every color in the app comes from here: components use these through
+ * Tailwind utilities (bg-surface, text-fg-muted, border-line, ...), and the 3D scene reads
+ * them with getComputedStyle. Dark values are the defaults; light values override them
+ * below under [data-theme="light"].
+ *
+ * `--color-*: initial` removes Tailwind's default palette, so a hardcoded color class such as
+ * `text-white` or `bg-red-500` generates no CSS at all instead of a color that ignores the theme.
+ *
+ * `static` makes Tailwind emit every token even when no utility class uses it; the 3D scene
+ * reads some (e.g. --color-arch-attention) only from JavaScript.
+ */
+@theme static {
+  --color-*: initial;
 
+  /* Surfaces */
+  --color-canvas: #0f1419;          /* page background */
+  --color-surface: #161c24;         /* panels and cards */
+  --color-raised: #1d252f;          /* hover, selected, nested blocks */
+  --color-sunken: #0b0f14;          /* tracks and wells inside panels */
+  --color-line: #252e39;            /* dividers, panel borders */
+  --color-line-strong: #636f7d;     /* input and control borders */
+
+  /* Text */
+  --color-fg: #e6edf3;
+  --color-fg-muted: #9ba7b4;
+
+  /* Accents */
+  --color-accent: #4fb8af;          /* muted teal */
+  --color-accent-fg: #0b1f1d;       /* text on an accent fill */
+  --color-accent-2: #a99ae0;        /* attention model / secondary accent */
+  --color-danger: #f0877c;
+  --color-success: #62c793;
+
+  /* Secondary structure (helix / strand / coil) */
+  --color-ss-helix: #e57a6e;
+  --color-ss-strand: #d8b04c;
+  --color-ss-coil: #6e7a88;
+
+  /* Model series in charts */
+  --color-model-baseline: #6e7a88;
+  --color-model-pssm: #4fb8af;
+  --color-model-attention: #a99ae0;
+
+  /* Architecture 3D scene */
+  --color-arch-input: #7d8996;
+  --color-arch-layer: #4fb8af;
+  --color-arch-attention: #a99ae0;
+  --color-arch-op: #9ba7b4;
+  --color-arch-op-fg: #0f1419;
+  --color-arch-output: #62c793;
+  --color-arch-edge: #4d5866;
+  --color-arch-skip: #a99ae0;
+
+  /* Type */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Spacing */
   --spacing-gutter: 16px;
-  --spacing-base: 8px;
-  --spacing-container-padding: 24px;
-  --spacing-panel-gap: 20px;
+  --spacing-container-padding: 32px;
+  --spacing-panel-gap: 24px;
 
-  --font-headline-md: "Space Grotesk", sans-serif;
-  --font-body-md: "Inter", sans-serif;
-  --font-label-caps: "Space Grotesk", sans-serif;
-  --font-display-stat: "Space Grotesk", sans-serif;
-  --font-headline-md-mobile: "Space Grotesk", sans-serif;
-  --font-display-lg: "Space Grotesk", sans-serif;
-  --font-body-lg: "Inter", sans-serif;
+  --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.3);
+}
+
+:root[data-theme="light"] {
+  --color-canvas: #f6f8fa;
+  --color-surface: #ffffff;
+  --color-raised: #f0f3f6;
+  --color-sunken: #eaeef2;
+  --color-line: #d8dee4;
+  --color-line-strong: #818a94;
+
+  --color-fg: #1f2328;
+  --color-fg-muted: #59636e;
+
+  --color-accent: #0f766e;
+  --color-accent-fg: #ffffff;
+  --color-accent-2: #6a4fbf;
+  --color-danger: #c1362c;
+  --color-success: #1a7f4b;
+
+  --color-ss-helix: #9f2f26;
+  --color-ss-strand: #a87a0a;
+  --color-ss-coil: #7a848f;
+
+  --color-model-baseline: #8c959f;
+  --color-model-pssm: #0f766e;
+  --color-model-attention: #6a4fbf;
+
+  --color-arch-input: #8c959f;
+  --color-arch-layer: #14857c;
+  --color-arch-attention: #7b62cc;
+  --color-arch-op: #6e7781;
+  --color-arch-op-fg: #ffffff;
+  --color-arch-output: #1f8f55;
+  --color-arch-edge: #8c959f;
+  --color-arch-skip: #6a4fbf;
+
+  --shadow-panel: 0 1px 2px rgb(31 35 40 / 0.06), 0 1px 3px rgb(31 35 40 / 0.04);
+}
+
+:root {
+  color-scheme: dark;
+}
+/* Set briefly by applyTheme() while switching themes. */
+:root[data-theme-switching] *,
+:root[data-theme-switching] *::before,
+:root[data-theme-switching] *::after {
+  transition: none !important;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
 }
 
 body {
-  min-height: max(884px, 100dvh);
-  background-color: #0a1323;
+  min-height: 100dvh;
+  background-color: var(--color-canvas);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
-.glass-panel {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+@layer components {
+  /* The one card style used across the app: solid surface, hairline border, soft shadow. */
+  .panel {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-panel);
+  }
+
+  /* Small section label above headings and in table headers. */
+  .eyebrow {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-fg-muted);
+  }
+
+  .seq-input {
+    background-color: var(--color-canvas);
+    border: 1px solid var(--color-line-strong);
+    color: var(--color-fg);
+    font-family: var(--font-mono);
+  }
 }
-.glass-panel-real-border {
-  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-top: 1px solid rgba(255,255,255,0.3);
-  border-left: 1px solid rgba(255,255,255,0.2);
-  border-radius: 0.75rem;
-}
-.bio-bg-pattern {
-  background-image: radial-gradient(circle at 50% 50%, rgba(0, 219, 233, 0.05) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 20%, rgba(228, 181, 255, 0.05) 0%, transparent 40%);
-}
-.dna-bg {
-  background-image: url("data:image/svg+xml,%3Csvg width='100' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20,20 Q50,100 80,180 M80,20 Q50,100 20,180' stroke='rgba(0, 219, 233, 0.03)' stroke-width='2' fill='none'/%3E%3Cline x1='35' y1='60' x2='65' y2='60' stroke='rgba(0, 219, 233, 0.03)' stroke-width='1'/%3E%3Cline x1='35' y1='140' x2='65' y2='140' stroke='rgba(0, 219, 233, 0.03)' stroke-width='1'/%3E%3C/svg%3E");
-  background-size: 100px 200px;
-}
-.glow-border-cyan { box-shadow: 0 0 15px rgba(0, 219, 233, 0.2); }
-.glow-border-violet { box-shadow: 0 0 15px rgba(228, 181, 255, 0.2); }
-.seq-input {
-  background: rgba(5, 14, 29, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #dbfcff;
-  font-family: monospace;
-}
-.seq-block {
-  display: inline-block;
-  width: 14px;
-  height: 24px;
-  margin-right: 2px;
-  border-radius: 2px;
-  transition: all 0.2s ease;
-}
-.seq-helix { background-color: #ef4444; }
-.seq-strand { background-color: #eab308; }
-.seq-coil { background-color: #64748b; }
-.timeline-connector::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 100%;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(0, 219, 233, 0.8), rgba(228, 181, 255, 0.2));
-  z-index: -1;
-}
-.timeline-connector:last-child::after { display: none; }
