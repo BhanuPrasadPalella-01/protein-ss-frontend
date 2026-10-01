@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Protein Secondary Structure Prediction</title>
+    <script>
+      // Apply a saved light/dark choice before first paint so reloads don't flash the default theme.
+      // React syncs its own state from the same localStorage key after mount (see src/App.jsx).
+      try {
+        var t = localStorage.getItem('theme')
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t
+      } catch (e) {}
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   </head>
