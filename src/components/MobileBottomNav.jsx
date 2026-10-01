@@ -15,6 +15,10 @@ export default function MobileBottomNav() {
         <span className="material-symbols-outlined">database</span>
         <span className="text-[10px] font-label-caps mt-1">Explore</span>
       </Link>
+      <Link to="/architecture" className="flex flex-col items-center text-on-surface-variant hover:text-primary">
+        <span className="material-symbols-outlined">view_in_ar</span>
+        <span className="text-[10px] font-label-caps mt-1">Model</span>
+      </Link>
     </nav>
   )
 }

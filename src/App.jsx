@@ -6,6 +6,7 @@ import Overview from './pages/Overview'
 import Predict from './pages/Predict'
 import Compare from './pages/Compare'
 import Explorer from './pages/Explorer'
+import Architecture from './pages/Architecture'
 import About from './pages/About'
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
               <Route path="/predict" element={<Predict />} />
               <Route path="/compare" element={<Compare />} />
               <Route path="/explorer" element={<Explorer />} />
+              <Route path="/architecture" element={<Architecture />} />
               <Route path="/about" element={<About />} />
             </Routes>
           </main>

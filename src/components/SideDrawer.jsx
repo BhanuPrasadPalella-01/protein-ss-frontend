@@ -9,6 +9,7 @@ export default function SideDrawer() {
     { path: '/predict', icon: 'query_stats', label: 'Live Prediction' },
     { path: '/compare', icon: 'compare_arrows', label: 'Model Comparison' },
     { path: '/explorer', icon: 'database', label: 'Sample Explorer' },
+    { path: '/architecture', icon: 'view_in_ar', label: 'Architecture' },
     { path: '/about', icon: 'info', label: 'About' },
   ]
 
