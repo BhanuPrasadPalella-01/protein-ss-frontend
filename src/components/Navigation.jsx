@@ -27,6 +27,7 @@ export default function Navigation() {
         <Link className={linkClass('/predict')} to="/predict">PREDICT</Link>
         <Link className={linkClass('/compare')} to="/compare">COMPARE</Link>
         <Link className={linkClass('/explorer')} to="/explorer">EXPLORE</Link>
+        <Link className={linkClass('/architecture')} to="/architecture">ARCHITECTURE</Link>
         <Link className={linkClass('/about')} to="/about">ABOUT</Link>
       </div>
 
