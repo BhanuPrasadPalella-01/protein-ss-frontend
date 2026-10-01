@@ -90,8 +90,8 @@ export default function Explorer() {
                 <p className="text-on-surface-variant text-sm">{selectedSample.length} residues • CB513 benchmark</p>
               </div>
               <div className="bg-tertiary-container/10 border border-tertiary-container/30 px-4 py-2 rounded-lg flex items-center gap-2">
-                <span className="material-symbols-outlined text-tertiary-container text-sm">verified</span>
-                <span className="text-[10px] font-bold uppercase text-tertiary-container">Benchmark Validated</span>
+                <span className="material-symbols-outlined text-tertiary-container text-sm">science</span>
+                <span className="text-[10px] font-bold uppercase text-tertiary-container">Held-out test set</span>
               </div>
             </div>
           )}
