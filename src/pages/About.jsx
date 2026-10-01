@@ -20,7 +20,7 @@ export default function About() {
     <div className="flex-1 p-gutter md:p-container-padding flex flex-col gap-10 max-w-6xl">
       <section className="text-center pt-6">
         <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-fg mb-3">Methodology & research</h1>
-        <p className="text-fg-muted max-w-2xl mx-auto">Project breakdown of the Neuro-Protein Alpha AI sequencing system.</p>
+        <p className="text-fg-muted max-w-2xl mx-auto">How the protein secondary structure prediction pipeline was built and evaluated.</p>
       </section>
 
       <div className="panel p-6 md:p-8">
