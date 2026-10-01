@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const API_URL = 'https://protein-ss-backend.onrender.com'
+
+const SLOW_REQUEST_MS = 4000
 
 const colorMap = { H: 'bg-error', E: 'bg-tertiary-container', C: 'bg-surface-bright' }
 
@@ -9,12 +11,20 @@ export default function Predict() {
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [slow, setSlow] = useState(false)
+
+  // The backend sleeps on Render's free tier; ping it on page load so it starts waking up early.
+  useEffect(() => {
+    fetch(`${API_URL}/health`).catch(() => {})
+  }, [])
 
   const handlePredict = async () => {
     if (!sequence.trim()) return
     setLoading(true)
     setError(null)
     setResult(null)
+    setSlow(false)
+    const slowTimer = setTimeout(() => setSlow(true), SLOW_REQUEST_MS)
 
     try {
       const res = await fetch(`${API_URL}/predict/baseline`, {
@@ -31,6 +41,8 @@ export default function Predict() {
     } catch (err) {
       setError(err.message)
     } finally {
+      clearTimeout(slowTimer)
+      setSlow(false)
       setLoading(false)
     }
   }
@@ -60,6 +72,11 @@ export default function Predict() {
             onChange={(e) => setSequence(e.target.value)}
           ></textarea>
         </div>
+        {loading && slow && (
+          <div className="z-10 bg-primary-container/10 border border-primary/20 text-primary-fixed-dim px-4 py-2 rounded-lg text-sm">
+            Waking up the server, this can take up to a minute…
+          </div>
+        )}
         {error && (
           <div className="z-10 bg-error/10 border border-error/30 text-error px-4 py-2 rounded-lg text-sm">
             {error}
