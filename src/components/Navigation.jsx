@@ -17,8 +17,10 @@ export default function Navigation() {
       {/* Brand */}
       <div className="flex items-center gap-2">
         <span className="material-symbols-outlined text-accent text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>biotech</span>
+        {/* Full name where there's room; the short form keeps the header from crowding next to the links. */}
         <span className="text-base font-semibold tracking-tight text-fg hidden sm:block">
-          NEURO-PROTEIN
+          <span className="hidden lg:inline">Protein Secondary Structure</span>
+          <span className="lg:hidden">Protein SS</span>
         </span>
       </div>
 
