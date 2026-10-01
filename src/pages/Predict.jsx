@@ -1,5 +1,8 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+
+// Three.js is only downloaded once a prediction is shown on this page.
+const StructureScene = lazy(() => import('../components/StructureScene'))
 
 const API_URL = 'https://protein-ss-backend.onrender.com'
 
@@ -125,6 +128,17 @@ export default function Predict() {
               <div key={i} className={`h-full ${colorMap[c]}`} style={{ width: `${100 / result.predicted_structure.length}%` }}></div>
             ))}
           </div>
+
+          <figure className="flex flex-col gap-2">
+            <div className="h-[260px] md:h-[300px] rounded-lg border border-line bg-sunken overflow-hidden">
+              <Suspense fallback={<div className="h-full flex items-center justify-center text-fg-muted text-sm">Loading 3D view…</div>}>
+                <StructureScene structure={result.predicted_structure} />
+              </Suspense>
+            </div>
+            <figcaption className="text-sm text-fg-muted">
+              Schematic from predicted H/E/C labels, not a folded 3D structure. Drag to rotate, scroll or pinch to zoom.
+            </figcaption>
+          </figure>
 
           <div className="grid grid-cols-3 gap-4">
             {[['H', 'Helix'], ['E', 'Strand'], ['C', 'Coil']].map(([key, label]) => (
