@@ -17,49 +17,49 @@ export default function About() {
   ]
 
   return (
-    <div className="flex-1 p-gutter md:p-container-padding flex flex-col gap-12">
-      <section className="text-center py-8">
-        <h1 className="text-4xl md:text-5xl font-headline-md text-primary mb-4 font-bold">Methodology & Research</h1>
-        <p className="text-on-surface-variant max-w-2xl mx-auto">Project breakdown of the Neuro-Protein Alpha AI sequencing system.</p>
+    <div className="flex-1 p-gutter md:p-container-padding flex flex-col gap-10 max-w-6xl">
+      <section className="text-center pt-6">
+        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-fg mb-3">Methodology & research</h1>
+        <p className="text-fg-muted max-w-2xl mx-auto">Project breakdown of the Neuro-Protein Alpha AI sequencing system.</p>
       </section>
 
-      <div className="glass-panel p-8 rounded-xl relative overflow-hidden">
-        <div className="flex items-center gap-3 mb-12 border-b border-white/10 pb-4">
-          <span className="material-symbols-outlined text-primary-fixed-dim">account_tree</span>
-          <h2 className="text-2xl font-bold">Architecture Pipeline</h2>
+      <div className="panel p-6 md:p-8">
+        <div className="flex items-center gap-3 mb-8 border-b border-line pb-4">
+          <span className="material-symbols-outlined text-accent">account_tree</span>
+          <h2 className="text-xl font-semibold text-fg">Architecture pipeline</h2>
         </div>
         <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 md:gap-0">
           {stages.map((stage, idx) => (
             <React.Fragment key={idx}>
-              <div className="flex-1 flex flex-col items-center text-center px-4 relative">
-                <div className="w-12 h-12 rounded-full bg-surface-container-highest border border-primary-fixed-dim/30 flex items-center justify-center mb-4 z-10">
-                  <span className="material-symbols-outlined text-primary-fixed-dim text-xl">{stage.icon}</span>
+              <div className="flex-1 flex flex-col items-center text-center px-4">
+                <div className="w-12 h-12 rounded-full bg-raised border border-line flex items-center justify-center mb-3">
+                  <span className="material-symbols-outlined text-accent text-xl">{stage.icon}</span>
                 </div>
-                <h3 className="text-xs font-bold uppercase mb-1">{stage.title}</h3>
-                <p className="text-[10px] text-on-surface-variant uppercase">{stage.desc}</p>
+                <h3 className="text-sm font-medium text-fg mb-0.5">{stage.title}</h3>
+                <p className="text-sm text-fg-muted">{stage.desc}</p>
               </div>
               {idx < stages.length - 1 && (
-                <div className="w-px h-8 md:h-px md:w-8 bg-outline-variant opacity-30 mx-auto my-2 md:my-0 shrink-0 md:-mt-8"></div>
+                <div className="w-px h-8 md:h-px md:w-8 bg-line mx-auto my-2 md:my-0 shrink-0 md:-mt-8"></div>
               )}
             </React.Fragment>
           ))}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-panel-gap">
         {team.map((member) => (
-          <div key={member.name} className="glass-panel p-6 rounded-xl flex flex-col items-center text-center hover:bg-white/5 transition-all">
-            <div className="w-20 h-20 rounded-full bg-surface-container-highest border border-white/10 flex items-center justify-center mb-4">
-              <span className="material-symbols-outlined text-4xl text-on-surface-variant">person</span>
+          <div key={member.name} className="panel p-6 flex flex-col items-center text-center">
+            <div className="w-16 h-16 rounded-full bg-raised border border-line flex items-center justify-center mb-4">
+              <span className="material-symbols-outlined text-3xl text-fg-muted">person</span>
             </div>
-            <h4 className="font-bold">{member.name}</h4>
-            <p className="text-[10px] uppercase tracking-widest text-primary-fixed-dim mt-2">{member.id}</p>
+            <h4 className="font-medium text-fg">{member.name}</h4>
+            <p className="text-xs font-mono text-fg-muted mt-1">{member.id}</p>
           </div>
         ))}
       </div>
 
-      <footer className="mt-auto border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-6 opacity-60 text-xs">
-        <p>Dataset Citation: Wang, G., & Dunbrack, R. L. (2003). PISCES Server. Bioinformatics, 19(12).</p>
+      <footer className="mt-auto border-t border-line pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-fg-muted">
+        <p>Dataset citation: Wang, G., & Dunbrack, R. L. (2003). PISCES Server. Bioinformatics, 19(12).</p>
         <div className="flex gap-4">
           <span>PyTorch</span><span>NumPy</span><span>FastAPI</span><span>scikit-learn</span>
         </div>

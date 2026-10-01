@@ -3,17 +3,18 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Edges, Line, OrbitControls } from '@react-three/drei'
 import { CubicBezierCurve3, Quaternion, Vector3 } from 'three'
 import { EDGES, LAYERS, formatParams } from '../pages/architectureLayers'
+import { readColorTokens, useTheme } from '../theme'
 
-// Theme colors from index.css
-const COLORS = {
-  input: '#849495',      // outline
-  layer: '#00dbe9',      // primary-fixed-dim
-  attention: '#e4b5ff',  // secondary
-  op: '#b9cacb',         // on-surface-variant
-  classifier: '#2df882', // tertiary-container
-  output: '#2df882',
-  edge: '#3b494b',       // outline-variant
-  skip: '#e4b5ff',
+// Three.js materials can't use CSS classes, so the scene reads its colors from the --color-arch-*
+// tokens in index.css (re-read whenever the theme changes).
+const COLOR_TOKENS = ['arch-input', 'arch-layer', 'arch-attention', 'arch-op', 'arch-output', 'arch-edge', 'arch-skip']
+const tokenForKind = {
+  input: 'arch-input',
+  layer: 'arch-layer',
+  attention: 'arch-attention',
+  op: 'arch-op',
+  classifier: 'arch-output',
+  output: 'arch-output',
 }
 
 const SCENE_CENTER = [1.25, 0.3, 0]
@@ -77,9 +78,9 @@ function LabelProjector({ registry, hovered }) {
   return null
 }
 
-function LayerBlock({ layer, hovered, onHover, anchorRef }) {
+function LayerBlock({ layer, colors, hovered, onHover, anchorRef }) {
   const { width, height, depth } = layer.size
-  const color = COLORS[layer.kind]
+  const color = colors[tokenForKind[layer.kind]]
   const isOp = layer.kind === 'op'
 
   const handlers = {
@@ -117,7 +118,7 @@ function edgeAnchor(layer, side) {
   return new Vector3(layer.pos[0] + side * half, layer.pos[1], 0)
 }
 
-function Connection({ edge, anchorRef }) {
+function Connection({ edge, colors, anchorRef }) {
   const from = byId[edge.from]
   const to = byId[edge.to]
 
@@ -144,7 +145,7 @@ function Connection({ edge, anchorRef }) {
     }
   }, [edge, from, to])
 
-  const color = edge.skip ? COLORS.skip : COLORS.edge
+  const color = edge.skip ? colors['arch-skip'] : colors['arch-edge']
   return (
     <group>
       <Line points={points} color={color} lineWidth={edge.skip ? 2.5 : 2} dashed={edge.skip} dashSize={0.3} gapSize={0.15} />
@@ -164,7 +165,8 @@ function FitCamera() {
   const controls = useThree((s) => s.controls)
   const aspect = useThree((s) => s.size.width / s.size.height)
   useLayoutEffect(() => {
-    const distance = 1.08 * Math.max(SCENE_HALF_WIDTH / (TAN_HALF_FOV * aspect), SCENE_HALF_HEIGHT / TAN_HALF_FOV)
+    // 1.2 leaves room for the sway, which brings one end of the pipeline closer to the camera.
+    const distance = 1.2 * Math.max(SCENE_HALF_WIDTH / (TAN_HALF_FOV * aspect), SCENE_HALF_HEIGHT / TAN_HALF_FOV)
     camera.position.set(SCENE_CENTER[0], SCENE_CENTER[1] + distance * 0.15, distance)
     camera.lookAt(...SCENE_CENTER)
     controls?.update()
@@ -191,6 +193,9 @@ function Sway({ enabled, children }) {
 
 export default function ArchitectureScene() {
   const reducedMotion = usePrefersReducedMotion()
+  const { theme } = useTheme()
+  // App applies the new theme to <html> before re-rendering, so this reads the current token values.
+  const colors = useMemo(() => readColorTokens(COLOR_TOKENS), [theme]) // eslint-disable-line react-hooks/exhaustive-deps
   const [hovered, setHovered] = useState(null)
   // Maps label keys to their 3D anchor objects and overlay elements; filled in by callback refs.
   const registry = useMemo(() => ({ anchors: {}, labels: {} }), [])
@@ -209,7 +214,7 @@ export default function ArchitectureScene() {
         // which in on-demand mode would leave the labels unpositioned.
         onCreated={(state) => state.invalidate()}
         onPointerMissed={() => setHovered(null)}
-        fallback={<div className="p-6 text-on-surface-variant">3D view needs WebGL. The layer table below lists the same architecture.</div>}
+        fallback={<div className="p-6 text-fg-muted">3D view needs WebGL. The layer table below lists the same architecture.</div>}
       >
         <ambientLight intensity={0.6} />
         <directionalLight position={[5, 10, 8]} intensity={1.2} />
@@ -221,13 +226,14 @@ export default function ArchitectureScene() {
             <LayerBlock
               key={layer.id}
               layer={byId[layer.id]}
+              colors={colors}
               hovered={hovered === layer.id}
               onHover={setHovered}
               anchorRef={anchorRef}
             />
           ))}
           {EDGES.map((edge) => (
-            <Connection key={`${edge.from}-${edge.to}`} edge={edge} anchorRef={anchorRef} />
+            <Connection key={`${edge.from}-${edge.to}`} edge={edge} colors={colors} anchorRef={anchorRef} />
           ))}
         </Sway>
 
@@ -245,16 +251,16 @@ export default function ArchitectureScene() {
       <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
         {LAYERS.map((layer) => (
           <div key={layer.id} ref={labelRef(`label:${layer.id}`)} className="absolute left-0 top-0 invisible text-center whitespace-nowrap leading-tight">
-            <div className="text-[12px] font-semibold text-on-surface">{layer.label}</div>
-            <div className="text-[10px] font-mono text-on-surface-variant">{layer.shape}</div>
+            <div className="text-[12px] font-semibold text-fg">{layer.label}</div>
+            <div className="text-[10px] font-mono text-fg-muted">{layer.shape}</div>
           </div>
         ))}
         {LAYERS.filter((l) => l.kind === 'op').map((layer) => (
-          <div key={layer.id} ref={labelRef(`symbol:${layer.id}`)} className="absolute left-0 top-0 invisible text-surface font-bold text-lg leading-none">
+          <div key={layer.id} ref={labelRef(`symbol:${layer.id}`)} className="absolute left-0 top-0 invisible text-arch-op-fg font-bold text-lg leading-none">
             {layer.symbol}
           </div>
         ))}
-        <div ref={labelRef('label:skip')} className="absolute left-0 top-0 invisible text-[10px] font-bold uppercase tracking-wider text-secondary whitespace-nowrap">
+        <div ref={labelRef('label:skip')} className="absolute left-0 top-0 invisible text-[10px] font-semibold uppercase tracking-wider text-arch-skip whitespace-nowrap">
           Skip connection
         </div>
         {hoveredLayer && (
@@ -263,12 +269,12 @@ export default function ArchitectureScene() {
             ref={labelRef(`tip:${hoveredLayer.id}`)}
             data-fixed-size
             data-above
-            className="absolute left-0 top-0 invisible z-10 rounded-lg border border-white/15 bg-surface-container-high/95 px-3 py-2 text-xs whitespace-nowrap shadow-lg"
+            className="absolute left-0 top-0 invisible z-10 rounded-lg border border-line bg-surface px-3 py-2 text-xs whitespace-nowrap shadow-lg"
           >
-            <div className="font-bold text-on-surface">{hoveredLayer.name}</div>
-            <div className="font-mono text-primary-fixed-dim">{hoveredLayer.shape}</div>
-            <div className="text-on-surface-variant">{formatParams(hoveredLayer.params)}</div>
-            <div className="text-on-surface-variant/80 mt-1">{hoveredLayer.detail}</div>
+            <div className="font-semibold text-fg">{hoveredLayer.name}</div>
+            <div className="font-mono text-accent">{hoveredLayer.shape}</div>
+            <div className="text-fg-muted">{formatParams(hoveredLayer.params)}</div>
+            <div className="text-fg-muted mt-1">{hoveredLayer.detail}</div>
           </div>
         )}
       </div>
