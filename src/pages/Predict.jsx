@@ -1,10 +1,9 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { API_URL } from '../api'
 
 // Three.js is only downloaded once a prediction is shown on this page.
 const StructureScene = lazy(() => import('../components/StructureScene'))
-
-const API_URL = 'https://protein-ss-backend.onrender.com'
 
 const SLOW_REQUEST_MS = 4000
 

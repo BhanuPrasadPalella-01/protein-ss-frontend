@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-
-const API_URL = 'https://protein-ss-backend.onrender.com'
+import { API_URL } from '../api'
 
 const ssColor = { H: 'bg-ss-helix', E: 'bg-ss-strand', C: 'bg-ss-coil' }
 

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-
-const API_URL = 'https://protein-ss-backend.onrender.com'
+import { API_URL } from '../api'
 
 export default function Compare() {
   const [models, setModels] = useState(null)
