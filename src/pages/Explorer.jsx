@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { API_URL } from '../api'
+import { getJSON } from '../api'
 
 const ssColor = { H: 'bg-ss-helix', E: 'bg-ss-strand', C: 'bg-ss-coil' }
 
@@ -24,30 +24,37 @@ function StructureStrip({ structure }) {
 export default function Explorer() {
   const [samples, setSamples] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
-  const [prediction, setPrediction] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null); // { id, data } of the latest finished prediction
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_URL}/samples`)
-      .then((res) => res.json())
+    const ctrl = new AbortController()
+    getJSON('/samples', ctrl.signal)
       .then((data) => {
         setSamples(data)
         if (data.length > 0) setSelectedId(data[0].id)
       })
-      .catch((err) => setError(err.message))
+      .catch((err) => { if (err.name !== 'AbortError') setError(err.message) })
+    return () => ctrl.abort()
   }, [])
 
   useEffect(() => {
     if (!selectedId) return
-    setLoading(true)
-    setPrediction(null)
-    fetch(`${API_URL}/samples/${selectedId}/predict`)
-      .then((res) => res.json())
-      .then((data) => setPrediction(data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false))
+    // Abort the previous sample's request so a slow response can't overwrite a newer one.
+    const ctrl = new AbortController()
+    getJSON(`/samples/${selectedId}/predict`, ctrl.signal)
+      .then((data) => setResult({ id: selectedId, data }))
+      .catch((err) => { if (err.name !== 'AbortError') setError(err.message) })
+    return () => ctrl.abort()
   }, [selectedId])
+
+  const prediction = result?.id === selectedId ? result.data : null
+  const loading = Boolean(selectedId) && !prediction && !error
+
+  const selectSample = (id) => {
+    setError(null)
+    setSelectedId(id)
+  }
 
   const selectedSample = samples.find((s) => s.id === selectedId)
 
@@ -70,7 +77,7 @@ export default function Explorer() {
               <button
                 key={s.id}
                 type="button"
-                onClick={() => setSelectedId(s.id)}
+                onClick={() => selectSample(s.id)}
                 className={`w-full text-left px-3 py-2 rounded-md transition-colors border-l-2 focus-visible:outline-2 focus-visible:outline-accent ${s.id === selectedId ? 'bg-raised border-accent' : 'border-transparent hover:bg-raised'
                   }`}
               >
@@ -95,7 +102,11 @@ export default function Explorer() {
             </div>
           )}
 
-          {loading && <div className="panel p-6 text-fg-muted">Running predictions...</div>}
+          {loading && (
+            <div className="panel p-6 text-fg-muted" role="status">
+              Running predictions… The free server can take up to a minute to wake up on the first request.
+            </div>
+          )}
 
           {prediction && !loading && (
             <div className="panel p-6 flex flex-col gap-6">

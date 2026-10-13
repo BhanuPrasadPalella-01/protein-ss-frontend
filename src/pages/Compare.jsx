@@ -1,22 +1,27 @@
 import { useState, useEffect } from 'react'
-import { API_URL } from '../api'
+import { getJSON } from '../api'
 
 export default function Compare() {
   const [models, setModels] = useState(null)
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    fetch(`${API_URL}/comparison`)
-      .then((res) => res.json())
+    const ctrl = new AbortController()
+    getJSON('/comparison', ctrl.signal)
       .then((data) => setModels(data.models))
-      .catch((err) => setError(err.message))
+      .catch((err) => { if (err.name !== 'AbortError') setError(err.message) })
+    return () => ctrl.abort()
   }, [])
 
   if (error) {
     return <div className="p-8 text-danger" role="alert">Failed to load comparison data: {error}</div>
   }
   if (!models) {
-    return <div className="p-8 text-fg-muted">Loading comparison data...</div>
+    return (
+      <div className="p-8 text-fg-muted" role="status">
+        Loading comparison data… The free server can take up to a minute to wake up on the first request.
+      </div>
+    )
   }
 
   const [baseline, pssm, attention] = models
