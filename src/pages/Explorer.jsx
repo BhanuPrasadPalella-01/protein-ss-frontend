@@ -89,6 +89,23 @@ export default function Explorer() {
         </div>
 
         <div className="flex-1 flex flex-col gap-panel-gap">
+          {/* The sample list above is desktop-only; on smaller screens pick from a dropdown. */}
+          {samples.length > 0 && (
+            <div className="lg:hidden">
+              <label htmlFor="sample-select" className="eyebrow mb-2 block">Sample</label>
+              <select
+                id="sample-select"
+                value={selectedId ?? ''}
+                onChange={(e) => selectSample(e.target.value)}
+                className="w-full bg-raised border border-line rounded-lg px-3 py-2.5 text-sm text-fg focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/30"
+              >
+                {samples.map((s) => (
+                  <option key={s.id} value={s.id}>{s.id} · {s.length} residues</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {selectedSample && (
             <div className="panel p-6 flex justify-between items-center gap-4 flex-wrap">
               <div>
