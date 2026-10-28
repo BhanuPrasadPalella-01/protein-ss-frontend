@@ -39,6 +39,12 @@
   --color-ss-strand: #d8b04c;
   --color-ss-coil: #6e7a88;
 
+  /* Structure confidence (pLDDT), the standard AlphaFold/ESMFold bands; same in both themes */
+  --color-conf-very-high: #0053d6;  /* pLDDT > 90 */
+  --color-conf-high: #65cbf3;       /* 70-90 */
+  --color-conf-low: #ffdb13;        /* 50-70 */
+  --color-conf-very-low: #ff7d45;   /* < 50 */
+
   /* Model series in charts */
   --color-model-baseline: #6e7a88;
   --color-model-pssm: #4fb8af;

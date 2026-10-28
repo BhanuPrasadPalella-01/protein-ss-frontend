@@ -1,11 +1,20 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { API_URL } from '../api'
 
-// Three.js is only downloaded once a prediction is shown on this page.
+// The 3D libraries are only downloaded once a prediction is shown on this page.
+const ProteinViewer = lazy(() => import('../components/ProteinViewer'))
 const StructureScene = lazy(() => import('../components/StructureScene'))
 
 const SLOW_REQUEST_MS = 4000
+const FOLD_MAX_RESIDUES = 400 // the public ESMFold API's limit
+
+const CONFIDENCE_BANDS = [
+  { cls: 'bg-conf-very-high', label: 'Very high (>90)' },
+  { cls: 'bg-conf-high', label: 'Confident (70–90)' },
+  { cls: 'bg-conf-low', label: 'Low (50–70)' },
+  { cls: 'bg-conf-very-low', label: 'Very low (<50)' },
+]
 
 const colorMap = { H: 'bg-ss-helix', E: 'bg-ss-strand', C: 'bg-ss-coil' }
 
@@ -15,6 +24,35 @@ export default function Predict() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [slow, setSlow] = useState(false)
+  // 3D structure from ESMFold: { status: 'loading' | 'done' | 'error' | 'too-long', data?, error? }
+  const [fold, setFold] = useState(null)
+  const [colorBy, setColorBy] = useState('prediction')
+  const foldRequest = useRef(null)
+
+  const requestFold = async (seq) => {
+    foldRequest.current?.abort()
+    if (seq.length > FOLD_MAX_RESIDUES) {
+      setFold({ status: 'too-long' })
+      return
+    }
+    const ctrl = new AbortController()
+    foldRequest.current = ctrl
+    setFold({ status: 'loading' })
+    try {
+      const res = await fetch(`${API_URL}/fold`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sequence: seq }),
+        signal: ctrl.signal,
+      })
+      const data = await res.json().catch(() => null)
+      if (!res.ok) throw new Error(typeof data?.detail === 'string' ? data.detail : `Folding failed (server error ${res.status}).`)
+      setFold({ status: 'done', data })
+    } catch (err) {
+      if (err.name === 'AbortError') return
+      setFold({ status: 'error', error: err instanceof TypeError ? "Couldn't reach the server to fold this sequence." : err.message })
+    }
+  }
 
   // The backend sleeps on Render's free tier; ping it on page load so it starts waking up early.
   useEffect(() => {
@@ -26,6 +64,8 @@ export default function Predict() {
     setLoading(true)
     setError(null)
     setResult(null)
+    foldRequest.current?.abort()
+    setFold(null)
     setSlow(false)
     const slowTimer = setTimeout(() => setSlow(true), SLOW_REQUEST_MS)
 
@@ -45,6 +85,7 @@ export default function Predict() {
       }
       const data = await res.json()
       setResult(data)
+      requestFold(data.sequence)
     } catch (err) {
       // fetch itself rejects with a TypeError when the server can't be reached at all.
       setError(err instanceof TypeError
@@ -98,7 +139,8 @@ export default function Predict() {
         )}
         <div className="flex justify-between items-center gap-4 flex-wrap">
           <span className="text-fg-muted text-sm">
-            Standard amino-acid letters only · max 700 residues
+            Standard amino-acid letters only · max 700 residues.
+            <span className="block text-xs mt-0.5">For the 3D model, sequences up to {FOLD_MAX_RESIDUES} residues are also sent to Meta's ESMFold service.</span>
           </span>
           <button
             onClick={handlePredict}
@@ -128,14 +170,67 @@ export default function Predict() {
             ))}
           </div>
 
-          <figure className="flex flex-col gap-2">
-            <div className="h-[260px] md:h-[300px] rounded-lg border border-line bg-sunken overflow-hidden">
-              <Suspense fallback={<div className="h-full flex items-center justify-center text-fg-muted text-sm">Loading 3D view…</div>}>
-                <StructureScene structure={result.predicted_structure} />
-              </Suspense>
+          <figure className="flex flex-col gap-3">
+            <div className="flex justify-between items-center gap-3 flex-wrap">
+              <h3 className="text-base font-semibold text-fg">3D structure</h3>
+              {fold?.status === 'done' && (
+                <div role="group" aria-label="Color the structure by" className="flex gap-1 p-1 rounded-lg bg-raised border border-line text-sm">
+                  {[['prediction', 'Our prediction'], ['confidence', 'ESMFold confidence']].map(([id, label]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      aria-pressed={colorBy === id}
+                      onClick={() => setColorBy(id)}
+                      className={`px-3 py-1 rounded-md font-medium transition-colors ${colorBy === id ? 'bg-surface text-fg shadow-sm' : 'text-fg-muted hover:text-fg'}`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
+
+            <div className="h-[340px] md:h-[440px] rounded-lg border border-line bg-sunken overflow-hidden">
+              {fold?.status === 'loading' && (
+                <div className="h-full flex flex-col items-center justify-center gap-2 text-fg-muted text-sm" role="status">
+                  <span className="material-symbols-outlined animate-spin motion-reduce:animate-none text-accent" aria-hidden="true">progress_activity</span>
+                  Folding with ESMFold… usually a few seconds
+                </div>
+              )}
+              {fold?.status === 'done' && (
+                <Suspense fallback={<div className="h-full flex items-center justify-center text-fg-muted text-sm">Loading 3D viewer…</div>}>
+                  <ProteinViewer pdb={fold.data.pdb} structure={result.predicted_structure} plddt={fold.data.plddt} colorBy={colorBy} />
+                </Suspense>
+              )}
+              {(fold?.status === 'error' || fold?.status === 'too-long') && (
+                <Suspense fallback={<div className="h-full flex items-center justify-center text-fg-muted text-sm">Loading 3D view…</div>}>
+                  <StructureScene structure={result.predicted_structure} />
+                </Suspense>
+              )}
+            </div>
+
+            {fold?.status === 'done' && (
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-fg-muted">
+                {colorBy === 'prediction'
+                  ? [['bg-ss-helix', 'Helix'], ['bg-ss-strand', 'Strand'], ['bg-ss-coil', 'Coil']].map(([cls, label]) => (
+                      <span key={label} className="flex items-center gap-1.5"><span className={`w-3 h-3 rounded-sm ${cls}`} />{label}</span>
+                    ))
+                  : CONFIDENCE_BANDS.map((b) => (
+                      <span key={b.label} className="flex items-center gap-1.5"><span className={`w-3 h-3 rounded-sm ${b.cls}`} />{b.label}</span>
+                    ))}
+              </div>
+            )}
+
             <figcaption className="text-sm text-fg-muted">
-              Schematic from predicted H/E/C labels, not a folded 3D structure. Drag to rotate, scroll or pinch to zoom.
+              {fold?.status === 'done' && (
+                <>
+                  3D shape predicted by ESMFold (Meta){colorBy === 'prediction' ? ", colored by our model's helix/strand/coil labels" : ', colored by its per-residue confidence'}.
+                  {fold.data.mean_plddt !== null && ` Mean confidence (pLDDT): ${Math.round(fold.data.mean_plddt)}.`}
+                  {' '}Drag to rotate, scroll or pinch to zoom, hover a residue for details.
+                </>
+              )}
+              {fold?.status === 'too-long' && `ESMFold folds up to ${FOLD_MAX_RESIDUES} residues, so this shows a schematic from the predicted H/E/C labels instead, not a folded 3D structure.`}
+              {fold?.status === 'error' && `${fold.error} Showing a schematic from the predicted H/E/C labels instead, not a folded 3D structure.`}
             </figcaption>
           </figure>
 
