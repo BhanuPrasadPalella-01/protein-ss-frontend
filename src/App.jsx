@@ -12,15 +12,15 @@ import Architecture from './pages/Architecture'
 import About from './pages/About'
 
 export default function App() {
-  // Dark by default (index.html ships data-theme="dark"); a saved choice is restored after mount.
-  const [theme, setTheme] = useState('dark')
+  // Light by default (index.html ships data-theme="light"); a saved choice is restored after mount.
+  const [theme, setTheme] = useState('light')
 
   // Read the saved choice in an effect rather than during render, so server and client render the
   // same default. The inline script in index.html has usually applied it to <html> already, so this
   // just brings React state in line and there's no visible flash.
   useEffect(() => {
     const saved = loadSavedTheme()
-    if (saved && saved !== 'dark') {
+    if (saved && saved !== 'light') {
       applyTheme(saved)
       setTheme(saved) // eslint-disable-line react-hooks/set-state-in-effect -- one-time sync from localStorage on mount
     }

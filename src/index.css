@@ -3,8 +3,8 @@
 /*
  * Design tokens. Every color in the app comes from here: components use these through
  * Tailwind utilities (bg-surface, text-fg-muted, border-line, ...), and the 3D scene reads
- * them with getComputedStyle. Dark values are the defaults; light values override them
- * below under [data-theme="light"].
+ * them with getComputedStyle. Light values are the defaults; dark values override them
+ * below under [data-theme="dark"].
  *
  * `--color-*: initial` removes Tailwind's default palette, so a hardcoded color class such as
  * `text-white` or `bg-red-500` generates no CSS at all instead of a color that ignores the theme.
@@ -15,29 +15,31 @@
 @theme static {
   --color-*: initial;
 
+  /* Linen and terracotta. Light is the default; dark values are below under [data-theme="dark"]. */
+
   /* Surfaces */
-  --color-canvas: #0f1419;          /* page background */
-  --color-surface: #161c24;         /* panels and cards */
-  --color-raised: #1d252f;          /* hover, selected, nested blocks */
-  --color-sunken: #0b0f14;          /* tracks and wells inside panels */
-  --color-line: #252e39;            /* dividers, panel borders */
-  --color-line-strong: #636f7d;     /* input and control borders */
+  --color-canvas: #fbf6ef;          /* page background, warm linen */
+  --color-surface: #fffdf9;         /* panels and cards */
+  --color-raised: #f4ece1;          /* hover, selected, nested blocks */
+  --color-sunken: #f1e8dc;          /* tracks and wells inside panels */
+  --color-line: #e8ddcf;            /* dividers, panel borders */
+  --color-line-strong: #8f8275;     /* input and control borders */
 
   /* Text */
-  --color-fg: #e6edf3;
-  --color-fg-muted: #9ba7b4;
+  --color-fg: #2b2520;
+  --color-fg-muted: #6a5e54;
 
   /* Accents */
-  --color-accent: #4fb8af;          /* muted teal */
-  --color-accent-fg: #0b1f1d;       /* text on an accent fill */
-  --color-accent-2: #a99ae0;        /* attention model / secondary accent */
-  --color-danger: #f0877c;
-  --color-success: #62c793;
+  --color-accent: #a04a2a;          /* terracotta */
+  --color-accent-fg: #ffffff;       /* text on an accent fill */
+  --color-accent-2: #3d6b70;        /* deep teal: attention model / secondary accent */
+  --color-danger: #b3261e;
+  --color-success: #276b43;
 
   /* Secondary structure (helix / strand / coil) */
-  --color-ss-helix: #e57a6e;
-  --color-ss-strand: #d8b04c;
-  --color-ss-coil: #6e7a88;
+  --color-ss-helix: #9b2d4a;
+  --color-ss-strand: #a27918;
+  --color-ss-coil: #8a8177;
 
   /* Structure confidence (pLDDT), the standard AlphaFold/ESMFold bands; same in both themes */
   --color-conf-very-high: #0053d6;  /* pLDDT > 90 */
@@ -46,19 +48,19 @@
   --color-conf-very-low: #ff7d45;   /* < 50 */
 
   /* Model series in charts */
-  --color-model-baseline: #6e7a88;
-  --color-model-pssm: #4fb8af;
-  --color-model-attention: #a99ae0;
+  --color-model-baseline: #9a8f84;
+  --color-model-pssm: #a04a2a;
+  --color-model-attention: #3d6b70;
 
   /* Architecture 3D scene */
-  --color-arch-input: #7d8996;
-  --color-arch-layer: #4fb8af;
-  --color-arch-attention: #a99ae0;
-  --color-arch-op: #9ba7b4;
-  --color-arch-op-fg: #0f1419;
-  --color-arch-output: #62c793;
-  --color-arch-edge: #4d5866;
-  --color-arch-skip: #a99ae0;
+  --color-arch-input: #9a8f84;
+  --color-arch-layer: #b5603c;
+  --color-arch-attention: #4a7b80;
+  --color-arch-op: #75685d;
+  --color-arch-op-fg: #ffffff;
+  --color-arch-output: #3e7d56;
+  --color-arch-edge: #9a8f84;
+  --color-arch-skip: #3d6b70;
 
   /* Type */
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -69,48 +71,49 @@
   --spacing-container-padding: 32px;
   --spacing-panel-gap: 24px;
 
+  --shadow-panel: 0 1px 2px rgb(60 40 25 / 0.06), 0 1px 3px rgb(60 40 25 / 0.05);
+}
+
+/* Warm espresso dark mode: tinted browns, not black or navy. */
+:root[data-theme="dark"] {
+  --color-canvas: #221c18;
+  --color-surface: #2a231e;
+  --color-raised: #332a24;
+  --color-sunken: #1b1613;
+  --color-line: #3d332b;
+  --color-line-strong: #7d7065;
+
+  --color-fg: #f1e9e1;
+  --color-fg-muted: #bbaea2;
+
+  --color-accent: #e0906b;
+  --color-accent-fg: #221c18;
+  --color-accent-2: #83b5b9;
+  --color-danger: #f08a7e;
+  --color-success: #7cc49a;
+
+  --color-ss-helix: #e8879c;
+  --color-ss-strand: #d9b35a;
+  --color-ss-coil: #9c9187;
+
+  --color-model-baseline: #9c9187;
+  --color-model-pssm: #e0906b;
+  --color-model-attention: #83b5b9;
+
+  --color-arch-input: #a39789;
+  --color-arch-layer: #e0906b;
+  --color-arch-attention: #83b5b9;
+  --color-arch-op: #bbaea2;
+  --color-arch-op-fg: #221c18;
+  --color-arch-output: #7cc49a;
+  --color-arch-edge: #7d7065;
+  --color-arch-skip: #83b5b9;
+
   --shadow-panel: 0 1px 2px rgb(0 0 0 / 0.3);
 }
 
-:root[data-theme="light"] {
-  --color-canvas: #f6f8fa;
-  --color-surface: #ffffff;
-  --color-raised: #f0f3f6;
-  --color-sunken: #eaeef2;
-  --color-line: #d8dee4;
-  --color-line-strong: #818a94;
-
-  --color-fg: #1f2328;
-  --color-fg-muted: #59636e;
-
-  --color-accent: #0f766e;
-  --color-accent-fg: #ffffff;
-  --color-accent-2: #6a4fbf;
-  --color-danger: #c1362c;
-  --color-success: #1a7f4b;
-
-  --color-ss-helix: #9f2f26;
-  --color-ss-strand: #a87a0a;
-  --color-ss-coil: #7a848f;
-
-  --color-model-baseline: #8c959f;
-  --color-model-pssm: #0f766e;
-  --color-model-attention: #6a4fbf;
-
-  --color-arch-input: #8c959f;
-  --color-arch-layer: #14857c;
-  --color-arch-attention: #7b62cc;
-  --color-arch-op: #6e7781;
-  --color-arch-op-fg: #ffffff;
-  --color-arch-output: #1f8f55;
-  --color-arch-edge: #8c959f;
-  --color-arch-skip: #6a4fbf;
-
-  --shadow-panel: 0 1px 2px rgb(31 35 40 / 0.06), 0 1px 3px rgb(31 35 40 / 0.04);
-}
-
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 /* Set briefly by applyTheme() while switching themes. */
 :root[data-theme-switching] *,
@@ -118,8 +121,8 @@
 :root[data-theme-switching] *::after {
   transition: none !important;
 }
-:root[data-theme="light"] {
-  color-scheme: light;
+:root[data-theme="dark"] {
+  color-scheme: dark;
 }
 
 body {
