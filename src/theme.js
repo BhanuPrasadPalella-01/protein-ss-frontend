@@ -1,11 +1,11 @@
 import { createContext, useContext } from 'react'
 
 // The active theme lives in React state (in App) and is mirrored to <html data-theme="...">,
-// which is what the CSS tokens in index.css key off. index.html ships data-theme="dark", so the
+// which is what the CSS tokens in index.css key off. index.html ships data-theme="light", so the
 // default theme is correct before React loads. The saved choice in localStorage is only read
 // inside an effect (and by a small inline script in index.html), never during render, so this
 // is safe to server-render.
-export const ThemeContext = createContext({ theme: 'dark', toggleTheme: () => {} })
+export const ThemeContext = createContext({ theme: 'light', toggleTheme: () => {} })
 
 export const useTheme = () => useContext(ThemeContext)
 
